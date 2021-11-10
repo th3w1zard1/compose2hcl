@@ -4,6 +4,8 @@ Yet another attempt to convert from a compose file to a Nomad deployment HCL fil
 
 Uses a recursive descent parser to handle the docker-compose input, and spits out an hcl file in the browser.
 
+__Very Work-In-Progress - not for production use!__
+
 ## Running
 
 Just clone the repository, and open `index.html` in whatever browser you favour. No compilation.

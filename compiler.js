@@ -1,7 +1,8 @@
 const __lex = {
     line: 1,
     scope: 0,
-    buffer: ""
+    buffer: "",
+    next: undefined
 };
 
 const __out = {
@@ -49,14 +50,6 @@ function compile() {
         out_append( "ERR-STOP: " + err );
         alert( err );
     }
-
-    out_append( '\nEnd of parse....', '' )
-
-    out_append( JSON.stringify(lex_nextToken()) );
-    out_append( JSON.stringify(lex_nextToken()) );
-    out_append( JSON.stringify(lex_nextToken()) );
-    out_append( JSON.stringify(lex_nextToken()) );
-    out_append( JSON.stringify(lex_nextToken()) );
 }
 
 function lex_setup( input ) {
@@ -66,13 +59,15 @@ function lex_setup( input ) {
     __lex.line = 1;
     __lex.scope = 0;
     __lex.buffer = input.split('');
+    __lex.next = lex_nextToken();
 
     // Reset the output internals
     __out.prefix = '';
 }
 
 function lex_acceptChar( _char ) {
-    if( __lex.buffer[0] === _char ) {
+    console.log( __lex.buffer[0], __lex.buffer.length );
+    if( __lex.buffer.length > 0 && __lex.buffer[0] !== undefined, __lex.buffer[0] === _char ) {
         __lex.buffer.shift();
         return true;
     }
@@ -80,16 +75,18 @@ function lex_acceptChar( _char ) {
 }
 
 function lex_hasNext() {
-    return __lex.buffer.length > 0;
+    return __lex.next !== undefined;
 }
 
 function lex_nextToken() {
 
-    if( !lex_hasNext() )
-        return null;
+    if( __lex.buffer.length === 0 ) {
+        __lex.next = undefined;
+        return undefined;
+    }
 
     // Linebreaks, non-skipping, internal tracking
-    if( lex_acceptChar( '\n' ) ) {
+    while( lex_acceptChar( '\n' ) ) {
         __lex.line++;
         __lex.scope = 0;
     }
@@ -123,16 +120,17 @@ function lex_nextToken() {
 }
 
 function lex_acceptToken( value = null, type = 'text' ) {
-    let token = lex_nextToken();
-    if( token.type !== type )
-        throw "Unexpected token error, expected type '" +type+ "', but read type '" +token.type+ "' -> " +JSON.stringify(token);
+    if( __lex.next.type !== type )
+        throw "Unexpected token error, expected type '" +type+ "', but read type '" +__lex.next.type+ "' -> " +JSON.stringify(__lex.next);
     
-    if( value !== null && token.value !== value )
-        throw "Unexpected token error, expected value '" +value+ "', but read type '" +token.value+ "' -> " +JSON.stringify(token);
+    if( value !== null && __lex.next.value !== value )
+        throw "Unexpected token error, expected value '" +value+ "', but read type '" +__lex.next.value+ "' -> " +JSON.stringify(__lex.next);
     
-    console.log( "Token:", JSON.stringify(token) );
+    console.log( "Token:", JSON.stringify(__lex.next) );
 
-    return token;
+    oldToken = __lex.next;
+    __lex.next = lex_nextToken();
+    return oldToken;
 }
 
 function cc_version() {
@@ -141,11 +139,14 @@ function cc_version() {
 }
 
 function cc_service_list() {
-    lex_acceptToken( 'services' );
+    let root = lex_acceptToken( 'services' );
 
     out_append( 'group "services" {', 2 );
 
-    cc_service();
+    while( __lex.next.scope === root.scope+2 ) {
+        cc_service();
+    }
+    console.log( "No more services...", __lex.next );
 
     out_indent( -2 );
     out_append( '}' );
@@ -161,33 +162,54 @@ function cc_service() {
 
     let service_info = {
         image: null,
-        ports: []
+        ports: {}
     };
 
-    while( __lex.scope >= root.scope ) {
+    while( __lex.next.scope === root.scope+2 ) {
         let directive = lex_acceptToken();
-        console.log( "Directive", directive );
+        console.log( "Directive", directive.value );
         switch( directive.value ) {
             case 'image':
-                service_info.image = cc_service_image();
+                service_info.image = lex_acceptToken().value;
                 break;
             
             case 'build': // Unsupported by nomad
+                console.warn( 'Build directives are unsupported by nomad, skipping...' )
                 lex_acceptToken(); // Consume and skip
                 break;
 
             case 'depends_on':
+                cc_consume_scope( directive.scope+2 );
                 break;
             
             case 'ports':
+                cc_service_ports( service_info.ports );
                 break;
             
             case 'deploy':
+                cc_consume_scope( directive.scope+2 );
                 break;
 
             default:
-                out_append( 'Missing directive handler: ' +JSON.stringify(directive) );
+                console.warn( 'Missing directive handler:', directive.value );
         }
+        console.log( "No more directives..." );
+    }
+
+    // Write-out the ports
+    if( Object.keys(service_info.ports).length > 0 ) {
+
+        out_append( 'network {', 2 );
+
+        Object.keys(service_info.ports).forEach(port => {
+            let info = service_info.ports[port];
+            out_append( 'port "' +port+ '" {', 2 );
+            out_append( 'static = '+info.outer, -2 );
+            out_append( '}' );
+        });
+
+        out_indent( -2 );
+        out_append( '}' );
     }
 
     // Write the config object
@@ -196,6 +218,7 @@ function cc_service() {
     out_append( 'image = "' +service_info.image+ '"' );
     out_append( 'image_pull_timeout = "10m"' );
     out_append( 'force_pull = true' );
+    out_append( 'ports = ' +JSON.stringify(Object.keys(service_info.ports)) );
 
     out_indent( -2 );
     out_append( '}' );
@@ -205,6 +228,27 @@ function cc_service() {
     //
 }
 
-function cc_service_image() {
-    return lex_acceptToken( null, 'text' ).value;
+function cc_service_ports( ports ) {
+    let index = 0;
+
+    while( __lex.next.value === '-' ) {
+        lex_acceptToken( '-' );
+        let portDef = lex_acceptToken()
+                        .value
+                        .replace(/['"]+/g, '')
+                        .split(':');
+
+        ports[ 'port'+index ] = {
+            inner: parseInt( portDef[0] ),
+            outer: parseInt( portDef[1] )
+        }
+        index++;
+    }
+}
+
+function cc_consume_scope( scope ) {
+    while( lex_hasNext() && __lex.next.scope >= scope ) {
+        console.warn( "SKIP", __lex.next.scope, scope );
+        lex_acceptToken();
+    }
 }
