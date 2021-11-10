@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>docker-compose to hcl</title>
+        <link href="normalize.css" rel="stylesheet" />
+        <link href="style.css" rel="stylesheet" />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Source+Code+Pro&display=swap" rel="stylesheet">
+
+        <script src="compiler.js"></script>
+    </head>
+    <body>
+        <h1>docker-compose.yml to .hcl</h1>
+
+        <textarea id="compose-input" placeholder="Paste your docker-compose.yml here!"></textarea><br />
+        <input type="button" class="button" value="Compile!" onclick="compile()" /><br />
+        <textarea id="hcl-output" placeholder="Compile a docker-compose.yml above to get a roughly equivalent hcl here"></textarea><br />
+    </body>
+</html>
