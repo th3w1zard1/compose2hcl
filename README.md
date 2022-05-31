@@ -6,6 +6,8 @@ Uses a recursive descent parser to handle the docker-compose input, and spits ou
 
 __Very Work-In-Progress - not for production use!__
 
+[Click here for the github pages demo](https://johnvidler.github.io/compose2hcl/)
+
 ## Running
 
 Just clone the repository, and open `index.html` in whatever browser you favour. No compilation.
