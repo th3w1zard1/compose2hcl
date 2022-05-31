@@ -67,6 +67,8 @@ function lex_setup( input ) {
 
 function lex_acceptChar( _char ) {
     console.log( __lex.buffer[0], __lex.buffer.length );
+    if( __lex.buffer[0] === undefined )
+        throw "Lexer buffer reached an undefined head state, HALT!";
     if( __lex.buffer.length > 0 && __lex.buffer[0] !== undefined, __lex.buffer[0] === _char ) {
         __lex.buffer.shift();
         return true;
