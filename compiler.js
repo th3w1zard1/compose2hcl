@@ -204,6 +204,7 @@ function cc_service() {
 
             default:
                 console.warn( 'Missing directive handler:', directive.value );
+                cc_consume_scope( directive.scope+2 );
         }
         console.log( "No more directives..." );
     }
