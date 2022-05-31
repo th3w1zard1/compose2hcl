@@ -174,12 +174,12 @@ function cc_service() {
                 break;
             
             case 'build': // Unsupported by nomad
-                console.warn( "Unsupported directive: build" )
+                console.warn( "Unsupported directive: build" );
                 lex_acceptToken(); // Consume and skip
                 break;
 
             case 'depends_on':
-                console.warn( "Unsupported directive: depends_on" )
+                console.warn( "Unsupported directive: depends_on" );
                 cc_consume_scope( directive.scope+2 );
                 break;
             
@@ -188,12 +188,17 @@ function cc_service() {
                 break;
             
             case 'deploy':
-                console.warn( "Unsupported directive: deploy" )
+                console.warn( "Unsupported directive: deploy" );
                 cc_consume_scope( directive.scope+2 );
                 break;
             
             case 'labels':
-                console.warn( "Unsupported directive: labels" )
+                console.warn( "Unsupported directive: labels" );
+                cc_consume_scope( directive.scope+2 );
+                break;
+            
+            case 'environment':
+                console.warn( "Missing support for: environment" );
                 cc_consume_scope( directive.scope+2 );
                 break;
 
