@@ -201,10 +201,14 @@ function cc_service() {
                 console.warn( "Missing support for: environment" );
                 cc_consume_scope( directive.scope+2 );
                 break;
+            
+            case 'volumes':
+                console.warn( "Missing support for: volumes" );
+                cc_consule_scope( directive.scope+2 );
+                break;
 
             default:
                 console.warn( 'Missing directive handler:', directive.value );
-                cc_consume_scope( directive.scope+2 );
         }
         console.log( "No more directives..." );
     }
