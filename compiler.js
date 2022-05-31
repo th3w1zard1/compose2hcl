@@ -206,7 +206,7 @@ function cc_service() {
             
             case 'volumes':
                 console.warn( "Missing support for: volumes" );
-                cc_consule_scope( directive.scope+2 );
+                cc_consume_scope( directive.scope+2 );
                 break;
 
             default:
