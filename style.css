@@ -10,13 +10,22 @@ body {
     text-align: center;
 }
 
+h1 {
+    font-weight: bold;
+}
+
+content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
 textarea {
     resize: vertical;
     font-family: 'Source Code Pro', monospace;
-}
-
-h1 {
-    font-weight: bold;
+    flex-grow: 1;
 }
 
 .button {
@@ -24,6 +33,7 @@ h1 {
     font-weight: bold;
     text-shadow: 0.5px 0.5px darkgray;
     margin: 1em;
+    flex-grow: 0;
 }
 
 #compose-input {
