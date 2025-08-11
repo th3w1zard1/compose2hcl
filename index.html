@@ -1,23 +1,233 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>docker-compose to hcl</title>
+        <title>Docker Compose to Nomad HCL Converter</title>
         <link href="normalize.css" rel="stylesheet" />
         <link href="style.css" rel="stylesheet" />
+        <!-- <link href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css" rel="stylesheet" /> -->
+        <!-- <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" /> -->
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Source+Code+Pro&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&family=Source+Code+Pro:wght@400;600&display=swap" rel="stylesheet">
 
+        <!-- js-yaml library for robust YAML parsing -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
         <script src="compiler.js"></script>
     </head>
     <body>
-        <h1>docker-compose.yml to .hcl</h1>
+        <div class="container">
+            <header>
+                <h1>🐳 Docker Compose to Nomad HCL Converter</h1>
+                <p class="subtitle">Convert your Docker Compose files to Nomad job specifications</p>
+            </header>
 
-        <content>
-            <textarea id="compose-input" placeholder="Paste your docker-compose.yml here!"></textarea>
-            <input type="button" class="button" value="Compile!" onclick="compile()" />
-            <textarea id="hcl-output" placeholder="Compile a docker-compose.yml above to get a roughly equivalent hcl here"></textarea>
-        </content>
+            <main>
+                <div class="input-section">
+                    <div class="input-header">
+                        <h2>Input: Docker Compose YAML</h2>
+                        <div class="input-controls">
+                            <button type="button" class="button secondary" onclick="loadExample()">Load Example</button>
+                            <button type="button" class="button secondary" onclick="clearInput()">Clear</button>
+                        </div>
+                    </div>
+                    <textarea 
+                        id="compose-input" 
+                        placeholder="Paste your docker-compose.yml here!&#10;&#10;Supports all Docker Compose features:&#10;- Services with full configuration&#10;- Networks, volumes, configs, secrets&#10;- Environment variables, ports, mounts&#10;- Health checks, capabilities, GPU support&#10;- And much more..."
+                        rows="20"
+                    ></textarea>
+                </div>
+
+                <div class="controls">
+                    <button type="button" class="button primary" onclick="compile()">
+                        <span>🚀 Convert to Nomad HCL</span>
+                    </button>
+                    <div class="status" id="status"></div>
+                </div>
+
+                <div class="output-section">
+                    <div class="output-header">
+                        <h2>Output: Nomad HCL</h2>
+                        <div class="output-controls">
+                            <button type="button" class="button secondary" onclick="copyOutput()">Copy</button>
+                            <button type="button" class="button secondary" onclick="downloadOutput()">Download</button>
+                            <button type="button" class="button secondary" onclick="clearOutput()">Clear</button>
+                        </div>
+                    </div>
+                    <textarea 
+                        id="hcl-output" 
+                        placeholder="Convert a Docker Compose file above to get the equivalent Nomad HCL specification here.&#10;&#10;The converter supports:&#10;- Full service definitions&#10;- Resource constraints&#10;- Network configuration&#10;- Volume mounts&#10;- Environment variables&#10;- Health checks&#10;- And comprehensive Docker Compose features"
+                        rows="25"
+                        readonly
+                    ></textarea>
+                </div>
+            </main>
+
+            <footer>
+                <div class="features">
+                    <h3>✨ Features</h3>
+                    <ul>
+                        <li><strong>Complete Coverage:</strong> Supports all Docker Compose features</li>
+                        <li><strong>Robust Parsing:</strong> Handles complex YAML with comments and anchors</li>
+                        <li><strong>Nomad Optimized:</strong> Generates production-ready Nomad job specs</li>
+                        <li><strong>Error Handling:</strong> Clear feedback on parsing issues</li>
+                    </ul>
+                </div>
+                
+                <div class="supported-features">
+                    <h3>🔧 Supported Docker Compose Features</h3>
+                    <div class="feature-grid">
+                        <div class="feature-category">
+                            <h4>Services</h4>
+                            <ul>
+                                <li>Image & build configuration</li>
+                                <li>Ports & networking</li>
+                                <li>Environment variables</li>
+                                <li>Volumes & mounts</li>
+                                <li>Commands & entrypoints</li>
+                            </ul>
+                        </div>
+                        <div class="feature-category">
+                            <h4>Resources</h4>
+                            <ul>
+                                <li>CPU & memory limits</li>
+                                <li>GPU support</li>
+                                <li>Capabilities</li>
+                                <li>Health checks</li>
+                                <li>Restart policies</li>
+                            </ul>
+                        </div>
+                        <div class="feature-category">
+                            <h4>Advanced</h4>
+                            <ul>
+                                <li>Configs & secrets</li>
+                                <li>Networks & volumes</li>
+                                <li>Deploy strategies</li>
+                                <li>Development mode</li>
+                                <li>Service hooks</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <script>
+            // Utility functions
+            function loadExample() {
+                const example = `# Example Docker Compose file
+version: '3.8'
+
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - NGINX_HOST=localhost
+      - NGINX_PORT=80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./logs:/var/log/nginx
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    driver: bridge`;
+
+                document.getElementById('compose-input').value = example;
+            }
+
+            function clearInput() {
+                document.getElementById('compose-input').value = '';
+            }
+
+            function clearOutput() {
+                document.getElementById('hcl-output').value = '';
+            }
+
+            function copyOutput() {
+                const output = document.getElementById('hcl-output');
+                output.select();
+                document.execCommand('copy');
+                
+                const status = document.getElementById('status');
+                status.textContent = 'Copied to clipboard!';
+                status.className = 'status success';
+                setTimeout(() => {
+                    status.textContent = '';
+                    status.className = 'status';
+                }, 2000);
+            }
+
+            function downloadOutput() {
+                const output = document.getElementById('hcl-output').value;
+                if (!output.trim()) {
+                    alert('No output to download');
+                    return;
+                }
+
+                const blob = new Blob([output], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'nomad-job.hcl';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            // Enhanced compile function with status updates
+            const originalCompile = window.compile;
+            window.compile = function() {
+                const status = document.getElementById('status');
+                status.textContent = 'Converting...';
+                status.className = 'status processing';
+                
+                try {
+                    originalCompile();
+                    status.textContent = 'Conversion completed successfully!';
+                    status.className = 'status success';
+                    setTimeout(() => {
+                        status.textContent = '';
+                        status.className = 'status';
+                    }, 3000);
+                } catch (err) {
+                    status.textContent = 'Conversion failed';
+                    status.className = 'status error';
+                    setTimeout(() => {
+                        status.textContent = '';
+                        status.className = 'status';
+                    }, 5000);
+                }
+            };
+        </script>
     </body>
 </html>

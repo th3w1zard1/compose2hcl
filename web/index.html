@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compose2HCL - Docker Compose to Nomad HCL Converter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🐳</span>
+                    <h1>Compose2HCL</h1>
+                </div>
+                <p class="subtitle">Convert Docker Compose files to Nomad HCL with complete feature support</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="showExamples()">
+                    <span>📚</span> Examples
+                </button>
+                <button class="btn btn-secondary" onclick="showSettings()">
+                    <span>⚙️</span> Settings
+                </button>
+                <button class="btn btn-secondary" onclick="showInfo()">
+                    <span>ℹ️</span> Info
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="section-header">
+                    <h2>Docker Compose Input</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-small" onclick="clearInput()">Clear</button>
+                        <button class="btn btn-small" onclick="loadExample()">Load Example</button>
+                        <input type="file" id="file-input" accept=".yml,.yaml" style="display: none;" onchange="loadFile(event)">
+                        <button class="btn btn-small" onclick="document.getElementById('file-input').click()">Upload File</button>
+                    </div>
+                </div>
+                <div class="editor-container">
+                    <textarea id="compose-input" class="editor" placeholder="Paste your docker-compose.yml content here or upload a file..."></textarea>
+                    <div class="editor-info">
+                        <span id="input-stats">0 lines, 0 characters</span>
+                        <span class="editor-format">YAML</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controls -->
+            <section class="controls">
+                <button class="btn btn-primary btn-large" onclick="convert()" id="convert-btn">
+                    <span class="btn-icon">🔄</span>
+                    Convert to Nomad HCL
+                </button>
+                <button class="btn btn-secondary" onclick="validateOnly()">
+                    <span>✅</span> Validate Only
+                </button>
+            </section>
+
+            <!-- Status -->
+            <section class="status" id="status-section" style="display: none;">
+                <div id="status-content"></div>
+            </section>
+
+            <!-- Output Section -->
+            <section class="output-section">
+                <div class="section-header">
+                    <h2>Nomad HCL Output</h2>
+                    <div class="section-actions">
+                        <button class="btn btn-small" onclick="copyOutput()">Copy</button>
+                        <button class="btn btn-small" onclick="downloadOutput()">Download</button>
+                        <select id="output-format" class="format-select" onchange="changeOutputFormat()">
+                            <option value="hcl">HCL</option>
+                            <option value="json">JSON</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="editor-container">
+                    <textarea id="hcl-output" class="editor" readonly placeholder="Converted Nomad HCL will appear here..."></textarea>
+                    <div class="editor-info">
+                        <span id="output-stats">0 lines, 0 characters</span>
+                        <span class="editor-format">HCL</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 Compose2HCL. Open source Docker Compose to Nomad HCL converter.</p>
+                <div class="footer-links">
+                    <a href="#" onclick="showInfo()">Documentation</a>
+                    <a href="#" onclick="showExamples()">Examples</a>
+                    <a href="https://github.com/yourusername/compose2hcl" target="_blank">GitHub</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal()">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 id="modal-title">Modal Title</h3>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-content" id="modal-content">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
