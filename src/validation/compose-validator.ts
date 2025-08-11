@@ -252,12 +252,14 @@ function validateNetworks(compose: DockerComposeFile, errors: string[], warnings
   if (!compose.networks) return;
 
   for (const [networkName, network] of Object.entries(compose.networks)) {
-    if (network.driver && !['bridge', 'host', 'none', 'overlay'].includes(network.driver)) {
-      warnings.push(`Network '${networkName}' uses driver '${network.driver}' which may not be supported`);
-    }
+    if (network && typeof network === 'object') {
+      if (network.driver && !['bridge', 'host', 'none', 'overlay'].includes(network.driver)) {
+        warnings.push(`Network '${networkName}' uses driver '${network.driver}' which may not be supported`);
+      }
 
-    if (network.external) {
-      warnings.push(`Network '${networkName}' is external - ensure it exists in the Nomad environment`);
+      if (network.external) {
+        warnings.push(`Network '${networkName}' is external - ensure it exists in the Nomad environment`);
+      }
     }
   }
 }
@@ -269,12 +271,14 @@ function validateVolumes(compose: DockerComposeFile, errors: string[], warnings:
   if (!compose.volumes) return;
 
   for (const [volumeName, volume] of Object.entries(compose.volumes)) {
-    if (volume.driver && volume.driver !== 'local') {
-      warnings.push(`Volume '${volumeName}' uses driver '${volume.driver}' - may need CSI plugin in Nomad`);
-    }
+    if (volume && typeof volume === 'object') {
+      if (volume.driver && volume.driver !== 'local') {
+        warnings.push(`Volume '${volumeName}' uses driver '${volume.driver}' - may need CSI plugin in Nomad`);
+      }
 
-    if (volume.external) {
-      warnings.push(`Volume '${volumeName}' is external - ensure it exists in the Nomad environment`);
+      if (volume.external) {
+        warnings.push(`Volume '${volumeName}' is external - ensure it exists in the Nomad environment`);
+      }
     }
   }
 }
@@ -286,12 +290,14 @@ function validateConfigs(compose: DockerComposeFile, errors: string[], warnings:
   if (!compose.configs) return;
 
   for (const [configName, config] of Object.entries(compose.configs)) {
-    if (!config.file && !config.content && !config.external) {
-      errors.push(`Config '${configName}' must specify either 'file', 'content', or 'external'`);
-    }
+    if (config && typeof config === 'object') {
+      if (!config.file && !config.content && !config.external) {
+        errors.push(`Config '${configName}' must specify either 'file', 'content', or 'external'`);
+      }
 
-    if (config.external) {
-      warnings.push(`Config '${configName}' is external - will be converted to Vault template`);
+      if (config.external) {
+        warnings.push(`Config '${configName}' is external - will be converted to Vault template`);
+      }
     }
   }
 }
@@ -303,12 +309,14 @@ function validateSecrets(compose: DockerComposeFile, errors: string[], warnings:
   if (!compose.secrets) return;
 
   for (const [secretName, secret] of Object.entries(compose.secrets)) {
-    if (!secret.file && !secret.external) {
-      errors.push(`Secret '${secretName}' must specify either 'file' or 'external'`);
-    }
+    if (secret && typeof secret === 'object') {
+      if (!secret.file && !secret.external) {
+        errors.push(`Secret '${secretName}' must specify either 'file' or 'external'`);
+      }
 
-    if (secret.external) {
-      warnings.push(`Secret '${secretName}' is external - will be converted to Vault template`);
+      if (secret.external) {
+        warnings.push(`Secret '${secretName}' is external - will be converted to Vault template`);
+      }
     }
   }
 }
@@ -317,32 +325,34 @@ function validateSecrets(compose: DockerComposeFile, errors: string[], warnings:
  * Validate resource specifications
  */
 function validateResources(serviceName: string, resources: any, errors: string[], warnings: string[]) {
-  if (resources.limits) {
-    if (resources.limits.cpus) {
-      const cpus = parseFloat(resources.limits.cpus);
-      if (isNaN(cpus) || cpus <= 0) {
-        errors.push(`Service '${serviceName}' has invalid CPU limit: ${resources.limits.cpus}`);
+  if (resources && typeof resources === 'object') {
+    if (resources.limits && typeof resources.limits === 'object') {
+      if (resources.limits.cpus) {
+        const cpus = parseFloat(resources.limits.cpus);
+        if (isNaN(cpus) || cpus <= 0) {
+          errors.push(`Service '${serviceName}' has invalid CPU limit: ${resources.limits.cpus}`);
+        }
+      }
+
+      if (resources.limits.memory) {
+        if (!isValidMemorySpec(resources.limits.memory)) {
+          errors.push(`Service '${serviceName}' has invalid memory limit: ${resources.limits.memory}`);
+        }
+      }
+
+      if (resources.limits.devices) {
+        warnings.push(`Service '${serviceName}' uses device limits - ensure Nomad supports required devices`);
       }
     }
 
-    if (resources.limits.memory) {
-      if (!isValidMemorySpec(resources.limits.memory)) {
-        errors.push(`Service '${serviceName}' has invalid memory limit: ${resources.limits.memory}`);
+    if (resources.reservations && typeof resources.reservations === 'object') {
+      if (resources.reservations.devices) {
+        warnings.push(`Service '${serviceName}' uses device reservations - ensure Nomad supports required devices`);
       }
-    }
 
-    if (resources.limits.devices) {
-      warnings.push(`Service '${serviceName}' uses device limits - ensure Nomad supports required devices`);
-    }
-  }
-
-  if (resources.reservations) {
-    if (resources.reservations.devices) {
-      warnings.push(`Service '${serviceName}' uses device reservations - ensure Nomad supports required devices`);
-    }
-
-    if (resources.reservations.generic_resources) {
-      warnings.push(`Service '${serviceName}' uses generic resources - may need custom Nomad configuration`);
+      if (resources.reservations.generic_resources) {
+        warnings.push(`Service '${serviceName}' uses generic resources - may need custom Nomad configuration`);
+      }
     }
   }
 }

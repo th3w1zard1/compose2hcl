@@ -2,6 +2,7 @@
   "name": "compose2hcl",
   "version": "1.0.0",
   "description": "Complete Docker Compose to Nomad HCL converter with full spec compliance",
+  "homepage": "https://th3w1zard1.github.io/bolabaden",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "bin": {
@@ -37,7 +38,7 @@
   "bugs": {
     "url": "https://github.com/yourusername/compose2hcl/issues"
   },
-  "homepage": "https://github.com/yourusername/compose2hcl#readme",
+  "homepage": "https://th3w1zard1.github.io/bolabaden",
   "dependencies": {
     "js-yaml": "^4.1.0",
     "commander": "^11.1.0",

@@ -11,9 +11,22 @@ class Compose2HCLApp {
   }
 
   initializeApp() {
+    this.setupRepositoryInfo();
     this.setupEventListeners();
     this.loadExample();
     this.updateStats();
+  }
+
+  setupRepositoryInfo() {
+    if (window.REPO_CONFIG) {
+      const repoLink = document.getElementById('repo-link');
+      const repoName = document.getElementById('repo-name');
+      
+      if (repoLink && repoName) {
+        repoLink.href = window.REPO_CONFIG.url;
+        repoName.textContent = `${window.REPO_CONFIG.owner}/${window.REPO_CONFIG.repo}`;
+      }
+    }
   }
 
   setupEventListeners() {
