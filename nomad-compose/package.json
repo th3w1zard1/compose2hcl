@@ -1,0 +1,52 @@
+{
+  "name": "nomad-compose",
+  "version": "1.0.0",
+  "description": "CLI tool to deploy Docker Compose files to Nomad using compose2hcl",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "bin": {
+    "nomad-compose": "bin/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepublishOnly": "npm run build",
+    "start": "node lib/index.js"
+  },
+  "keywords": [
+    "nomad",
+    "docker-compose",
+    "deploy",
+    "cli",
+    "devops",
+    "orchestration",
+    "typescript"
+  ],
+  "author": "Boden Crouch",
+  "license": "BSL-1.1",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "chalk": "^5.3.0",
+    "inquirer": "^9.2.15",
+    "ora": "^8.0.1",
+    "axios": "^1.7.2",
+    "yaml": "^2.4.1",
+    "fs-extra": "^11.2.0",
+    "path": "^0.12.7",
+    "compose2hcl": "file:../compose2hcl"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.14.10",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.3.2",
+    "ts-jest": "^29.2.0",
+    "typescript": "^5.5.3"
+  }
+}

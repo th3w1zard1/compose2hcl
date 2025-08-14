@@ -2,72 +2,60 @@
   "name": "compose2hcl",
   "version": "1.0.0",
   "description": "Complete Docker Compose to Nomad HCL converter with full spec compliance",
-  "homepage": "https://th3w1zard1.github.io/bolabaden",
+  "homepage": "https://bolabaden.github.io/compose2hcl",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "bin": {
     "compose2hcl": "bin/cli.js"
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
     "test": "jest",
-    "test:watch": "jest --watch",
+    "test:build": "node test-build.js",
     "lint": "eslint src/**/*.ts",
-    "lint:fix": "eslint src/**/*.ts --fix",
-    "format": "prettier --write src/**/*.ts",
-    "prepublishOnly": "npm run build",
-    "start:web": "node server/web-server.js"
+    "format": "prettier --write \"src/**/*.ts\"",
+    "start:web": "node server/web-server.js",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
-    "docker",
     "docker-compose",
     "nomad",
     "hcl",
     "converter",
-    "hashicorp",
-    "containers",
-    "orchestration"
+    "devops",
+    "orchestration",
+    "typescript"
   ],
-  "author": "Your Name",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/yourusername/compose2hcl.git"
-  },
-  "bugs": {
-    "url": "https://github.com/yourusername/compose2hcl/issues"
-  },
-  "homepage": "https://th3w1zard1.github.io/bolabaden",
+  "author": "Boden Crouch",
+  "license": "BSL-1.1",
   "dependencies": {
+    "commander": "^12.1.0",
+    "express": "^4.19.2",
+    "joi": "^17.13.3",
     "js-yaml": "^4.1.0",
-    "commander": "^11.1.0",
-    "chalk": "^4.1.2",
-    "joi": "^17.11.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
-    "@types/node": "^20.8.0",
-    "@types/js-yaml": "^4.0.8",
-    "@types/jest": "^29.5.5",
-    "@typescript-eslint/eslint-plugin": "^6.7.4",
-    "@typescript-eslint/parser": "^6.7.4",
-    "eslint": "^8.51.0",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/joi": "^17.2.3",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20.14.10",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@typescript-eslint/eslint-plugin": "^7.16.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "jest": "^29.7.0",
-    "prettier": "^3.0.3",
-    "ts-jest": "^29.1.1",
-    "typescript": "^5.2.2",
-    "express": "^4.18.2",
-    "@types/express": "^4.17.17"
-  },
-  "engines": {
-    "node": ">=16.0.0"
-  },
-  "files": [
-    "lib/",
-    "bin/",
-    "server/",
-    "web/",
-    "README.md",
-    "LICENSE"
-  ]
+    "prettier": "^3.3.2",
+    "ts-jest": "^29.2.0",
+    "typescript": "^5.5.3",
+    "vite": "^7.1.2"
+  }
 }

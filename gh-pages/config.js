@@ -1,6 +1,6 @@
 // Auto-generated configuration
 window.REPO_CONFIG = {
-  owner: 'th3w1zard1',
+  owner: 'bolabaden',
   repo: 'compose2hcl.git',
-  baseUrl: 'https://th3w1zard1.github.io/compose2hcl.git'
+  baseUrl: 'https://bolabaden.github.io/compose2hcl.git'
 };

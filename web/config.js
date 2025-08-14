@@ -1,6 +1,6 @@
 // Auto-generated configuration
 window.REPO_CONFIG = {
-  owner: 'th3w1zard1',
+  owner: 'bolabaden',
   repo: 'bolabaden',
-  baseUrl: 'https://th3w1zard1.github.io/bolabaden'
+  baseUrl: 'https://bolabaden.github.io/bolabaden'
 };
